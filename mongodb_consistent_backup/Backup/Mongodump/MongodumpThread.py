@@ -50,7 +50,7 @@ class MongodumpThread(Process):
         signal(SIGINT, SIG_IGN)
         signal(SIGTERM, self.close)
 
-    def oplog_enabled(self):
+    def oplog_enabled_parse(self):
         if isinstance(self.oplog_enabled, bool):
             return self.oplog_enabled
         elif isinstance(self.oplog_enabled, str) and self.oplog_enabled.strip().lower() != 'false':
@@ -160,7 +160,7 @@ class MongodumpThread(Process):
                 "--port=%s" % str(mongodump_uri.port)
             ])
 
-        if self.oplog_enabled():
+        if self.oplog_enabled_parse():
           mongodump_flags.extend([
               "--oplog"
           ])
