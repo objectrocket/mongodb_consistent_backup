@@ -21,6 +21,7 @@ class Mongodump(Task):
         self.authdb             = self.config.authdb
         self.compression_method = self.config.backup.mongodump.compression
         self.binary             = self.config.backup.mongodump.binary
+        self.oplog_enabled      = self.config.backup.mongodump.oplog_enabled
         self.replsets           = replsets
         self.backup_stop        = backup_stop
         self.sharding           = sharding
@@ -138,7 +139,8 @@ class Mongodump(Task):
                     self.backup_dir,
                     self.version,
                     self.threads(),
-                    self.do_gzip()
+                    self.do_gzip(),
+                    self.oplog_enabled
                 )
                 self.dump_threads.append(thread)
             except Exception, e:

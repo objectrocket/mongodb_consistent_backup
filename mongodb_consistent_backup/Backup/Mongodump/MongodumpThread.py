@@ -15,16 +15,17 @@ from mongodb_consistent_backup.Oplog import Oplog
 
 # noinspection PyStringFormat
 class MongodumpThread(Process):
-    def __init__(self, state, uri, timer, config, base_dir, version, threads=0, dump_gzip=False):
+    def __init__(self, state, uri, timer, config, base_dir, version, threads=0, dump_gzip=False, oplog_enabled):
         Process.__init__(self)
-        self.state     = state
-        self.uri       = uri
-        self.timer     = timer
-        self.config    = config
-        self.base_dir  = base_dir
-        self.version   = version
-        self.threads   = threads
-        self.dump_gzip = dump_gzip
+        self.state         = state
+        self.uri           = uri
+        self.timer         = timer
+        self.config        = config
+        self.base_dir      = base_dir
+        self.version       = version
+        self.threads       = threads
+        self.dump_gzip     = dump_gzip
+        self.oplog_enabled = oplog_enabled
 
         self.user                 = self.config.username
         self.password             = self.config.password
@@ -152,8 +153,12 @@ class MongodumpThread(Process):
                 "--port=%s" % str(mongodump_uri.port)
             ])
 
+        if oplog_enabled:
+          mongodump_flags.extend([
+              "--oplog"
+          ])
+
         mongodump_flags.extend([
-            "--oplog",
             "--out=%s/dump" % self.backup_dir
         ])
 
