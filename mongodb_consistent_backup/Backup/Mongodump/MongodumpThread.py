@@ -15,7 +15,7 @@ from mongodb_consistent_backup.Oplog import Oplog
 
 # noinspection PyStringFormat
 class MongodumpThread(Process):
-    def __init__(self, state, uri, timer, config, base_dir, version, threads=0, dump_gzip=False, oplog_enabled):
+    def __init__(self, state, uri, timer, config, base_dir, version, threads=0, dump_gzip=False, oplog_enabled=True):
         Process.__init__(self)
         self.state         = state
         self.uri           = uri
