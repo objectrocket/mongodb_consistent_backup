@@ -50,6 +50,13 @@ class MongodumpThread(Process):
         signal(SIGINT, SIG_IGN)
         signal(SIGTERM, self.close)
 
+    def oplog_enabled(self):
+        if isinstance(self.oplog_enabled, bool):
+            return self.oplog_enabled
+        elif isinstance(self.oplog_enabled, str) and self.oplog_enabled.strip().lower() != 'false':
+            return True
+        return False
+
     def close(self, exit_code=None, frame=None):
         if self._command:
             logging.debug("Stopping running subprocess/command: %s" % self._command.command)
@@ -153,7 +160,7 @@ class MongodumpThread(Process):
                 "--port=%s" % str(mongodump_uri.port)
             ])
 
-        if oplog_enabled:
+        if self.oplog_enabled():
           mongodump_flags.extend([
               "--oplog"
           ])
