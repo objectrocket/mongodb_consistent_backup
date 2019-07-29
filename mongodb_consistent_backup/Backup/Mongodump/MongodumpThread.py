@@ -15,16 +15,17 @@ from mongodb_consistent_backup.Oplog import Oplog
 
 # noinspection PyStringFormat
 class MongodumpThread(Process):
-    def __init__(self, state, uri, timer, config, base_dir, version, threads=0, dump_gzip=False):
+    def __init__(self, state, uri, timer, config, base_dir, version, threads=0, dump_gzip=False, oplog_enabled=True):
         Process.__init__(self)
-        self.state     = state
-        self.uri       = uri
-        self.timer     = timer
-        self.config    = config
-        self.base_dir  = base_dir
-        self.version   = version
-        self.threads   = threads
-        self.dump_gzip = dump_gzip
+        self.state         = state
+        self.uri           = uri
+        self.timer         = timer
+        self.config        = config
+        self.base_dir      = base_dir
+        self.version       = version
+        self.threads       = threads
+        self.dump_gzip     = dump_gzip
+        self.oplog_enabled = oplog_enabled
 
         self.user                 = self.config.username
         self.password             = self.config.password
@@ -48,6 +49,13 @@ class MongodumpThread(Process):
 
         signal(SIGINT, SIG_IGN)
         signal(SIGTERM, self.close)
+
+    def oplog_enabled_parse(self):
+        if isinstance(self.oplog_enabled, bool):
+            return self.oplog_enabled
+        elif isinstance(self.oplog_enabled, str) and self.oplog_enabled.strip().lower() != 'false':
+            return True
+        return False
 
     def close(self, exit_code=None, frame=None):
         if self._command:
@@ -152,8 +160,12 @@ class MongodumpThread(Process):
                 "--port=%s" % str(mongodump_uri.port)
             ])
 
+        if self.oplog_enabled_parse():
+          mongodump_flags.extend([
+              "--oplog"
+          ])
+
         mongodump_flags.extend([
-            "--oplog",
             "--out=%s/dump" % self.backup_dir
         ])
 
@@ -233,20 +245,27 @@ class MongodumpThread(Process):
         except Exception, e:
             logging.exception("Error performing mongodump: %s" % e)
 
-        try:
-            oplog = Oplog(self.oplog_file, self.dump_gzip)
-            oplog.load()
-        except Exception, e:
-            logging.exception("Error loading oplog: %s" % e)
+        oplog = None
+        if self.oplog_enabled_parse():
+          try:
+              oplog = Oplog(self.oplog_file, self.dump_gzip)
+              oplog.load()
+          except Exception, e:
+              logging.exception("Error loading oplog: %s" % e)
 
         self.state.set('running', False)
         self.state.set('completed', True)
-        self.state.set('count', oplog.count())
-        self.state.set('first_ts', oplog.first_ts())
-        self.state.set('last_ts', oplog.last_ts())
+        if self.oplog_enabled_parse():
+          self.state.set('count', oplog.count())
+          self.state.set('first_ts', oplog.first_ts())
+          self.state.set('last_ts', oplog.last_ts())
         self.timer.stop(self.timer_name)
 
-        log_msg_extra = "%i oplog changes" % oplog.count()
-        if oplog.last_ts():
-            log_msg_extra = "%s, end ts: %s" % (log_msg_extra, oplog.last_ts())
+        if self.oplog_enabled_parse():
+          log_msg_extra = "%i oplog changes" % oplog.count()
+          if oplog.last_ts():
+              log_msg_extra = "%s, end ts: %s" % (log_msg_extra, oplog.last_ts())
+        else:
+          log_msg_extra="No oplog"
+
         logging.info("Backup %s completed in %.2f seconds, %s" % (self.uri, self.timer.duration(self.timer_name), log_msg_extra))
