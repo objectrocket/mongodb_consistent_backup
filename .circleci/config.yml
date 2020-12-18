@@ -3,59 +3,66 @@
 # Check https://circleci.com/docs/2.0/language-python/ for more details
 #
 version: 2
+references:
+  objectrocket-docker-auth:
+    auth:
+      username: ${DOCKER_USERNAME}
+      password: ${DOCKER_PASSWORD}
+  context-to-use:
+    context: objectrocket-shared
 jobs:
   build:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: objectrocket/circleci-rpm-builder:master
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
-      
+    - image: objectrocket/circleci-rpm-builder:master
+      auth:
+        username: $DOCKER_USER
+        password: $DOCKER_PASS
+
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/postgres:9.4
 
-        environment: 
-          PYTHON_BIN: /usr/local/bin/python2.7
+      environment:
+        PYTHON_BIN: /usr/local/bin/python2.7
     working_directory: ~/repo
 
     steps:
-      - checkout
+    - checkout
 
       # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "requirements.txt" }}
+    - restore_cache:
+        keys:
+        - v1-dependencies-{{ checksum "requirements.txt" }}
           # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+        - v1-dependencies-
 
-      - run:
-          name: set version and build the rpm
-          command: |
-            set -x
-            version=$(cat VERSION)
-            echo "${version}.${CIRCLE_BUILD_NUM}" > VERSION
-            make rpm
+    - run:
+        name: set version and build the rpm
+        command: |
+          set -x
+          version=$(cat VERSION)
+          echo "${version}.${CIRCLE_BUILD_NUM}" > VERSION
+          make rpm
 
-            git config user.email "dev@objectrocket.com"
-            git config user.name "objectrocketdev"
-            git tag -a $(cat VERSION) -m "Tagged by ${CIRCLE_BUILD_URL}" HEAD
-            rpm -qa | grep ssh
-            rpm -ql libssh2-1.4.2-2.el6_7.1.x86_64
-            git push --tags origin
-            
-            mkdir mongodb_consistent_backup_rpm
-            cp /root/repo/build/rpm/RPMS/x86_64/mongodb_consistent_backup-$(cat VERSION)-1.el6.x86_64.rpm mongodb_consistent_backup_rpm/
+          git config user.email "dev@objectrocket.com"
+          git config user.name "objectrocketdev"
+          git tag -a $(cat VERSION) -m "Tagged by ${CIRCLE_BUILD_URL}" HEAD
+          rpm -qa | grep ssh
+          rpm -ql libssh2-1.4.2-2.el6_7.1.x86_64
+          git push --tags origin
 
-      - save_cache:
-          paths:
-            - ./venv
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
-        
-      - store_artifacts:
-          path: mongodb_consistent_backup_rpm
-          destination: mongodb_consistent_backup
-       
+          mkdir mongodb_consistent_backup_rpm
+          cp /root/repo/build/rpm/RPMS/x86_64/mongodb_consistent_backup-$(cat VERSION)-1.el6.x86_64.rpm mongodb_consistent_backup_rpm/
+
+    - save_cache:
+        paths:
+        - ./venv
+        key: v1-dependencies-{{ checksum "requirements.txt" }}
+
+    - store_artifacts:
+        path: mongodb_consistent_backup_rpm
+        destination: mongodb_consistent_backup
+
