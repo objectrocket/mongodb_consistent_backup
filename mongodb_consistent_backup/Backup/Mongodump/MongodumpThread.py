@@ -168,6 +168,9 @@ class MongodumpThread(Process):
         mongodump_flags.extend([
             "--out=%s/dump" % self.backup_dir
         ])
+        mongodump_flags.extend([
+            "--compressor=%s" % "snappy"
+        ])
 
         # --numParallelCollections
         if self.threads > 0:
