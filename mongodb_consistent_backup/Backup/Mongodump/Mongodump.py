@@ -26,7 +26,7 @@ class Mongodump(Task):
         self.backup_stop        = backup_stop
         self.sharding           = sharding
 
-        self.compression_supported = ['auto', 'none', 'gzip']
+        self.compression_supported = ['auto', 'none', 'gzip', 'snappy']
         self.version               = 'unknown'
         self.version_extra         = {}
         self.threads_max           = 16
@@ -61,13 +61,28 @@ class Mongodump(Task):
             if self.compression() == 'auto':
                 logging.info("Mongodump binary supports gzip compression, auto-enabling gzip compression")
                 self.compression('gzip')
+        elif self.can_compress_snappy():
+            if self.compression() == 'snappy':
+                logging.info("Mongodump binary supports snappy compression, auto-enabling snappy compression")
+                self.compression('snappy')
         elif self.compression() == 'gzip':
             raise OperationError("mongodump gzip compression requested on binary that does not support gzip!")
+        elif self.compression() == 'snappy':
+            raise OperationError("mongodump snappy compression requested on binary that does not support snappy!")
 
     def can_compress(self):
         if os.path.isfile(self.binary) and os.access(self.binary, os.X_OK):
             logging.debug("Mongodump binary supports gzip compression")
             if tuple("3.2.0".split(".")) <= tuple(self.version.split(".")):
+                return True
+            return False
+        else:
+            raise OperationError("Cannot find or execute the mongodump binary file %s!" % self.binary)
+
+    def can_compress_snappy(self):
+        if os.path.isfile(self.binary) and os.access(self.binary, os.X_OK):
+            logging.debug("Mongodump binary supports snappy compression")
+            if tuple("4.2.0".split(".")) <= tuple(self.version.split(".")):
                 return True
             return False
         else:
