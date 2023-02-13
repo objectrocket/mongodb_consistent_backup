@@ -27,17 +27,14 @@ jobs:
 
       environment:
         PYTHON_BIN: /usr/local/bin/python2.7
+
     working_directory: ~/repo
 
     steps:
-    - run:
-        name: netrc
-        command: |
-          cat << EOF > ~/.netrc
-          machine github.com 
-          login $GITHUB_USER 
-          password $GITHUB_TOKEN
-          EOF
+    - add_ssh_keys:
+            fingerprints:
+              - d3:78:00:bc:eb:18:dc:cc:15:15:3c:3f:64:9e:ed:0e
+
     - checkout
 
 
