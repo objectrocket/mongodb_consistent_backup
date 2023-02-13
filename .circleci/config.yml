@@ -31,9 +31,16 @@ jobs:
 
     steps:
     - run:
-        name: set version and build the rpm
-        command: echo "started"
-
+        name: netrc
+        command: |
+          cat << EOF > ~/.netrc
+          machine github.com 
+          login $GITHUB_USER 
+          password $GITHUB_TOKEN
+          EOF
+    - run:
+        name: reset gitconfig
+        command: git config --global --remove-section url.ssh://git@github.com
     - checkout
 
 
