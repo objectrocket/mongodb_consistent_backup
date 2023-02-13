@@ -30,6 +30,10 @@ jobs:
     working_directory: ~/repo
 
     steps:
+    - run:
+        name: set version and build the rpm
+        command: echo "started"
+
     - checkout
 
 
