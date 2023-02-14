@@ -31,11 +31,8 @@ jobs:
     working_directory: ~/repo
 
     steps:
-    ## default circle ci checkout is removed to avoid ssh related error we will use token to checkout
-    ## https://support.circleci.com/hc/en-us/articles/115015659247-How-do-I-modify-the-checkout-step-
     - checkout
-
-
+  
     - run:
         name: set version and build the rpm
         command: |
