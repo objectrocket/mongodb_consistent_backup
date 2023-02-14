@@ -31,9 +31,6 @@ jobs:
     working_directory: ~/repo
 
     steps:
-    - run:
-        name: reset gitconfig
-        command: git config --global --remove-section url.ssh://git@github.com
     - checkout
 
 
