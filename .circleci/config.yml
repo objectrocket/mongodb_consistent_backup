@@ -15,7 +15,7 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-    - image: objectrocket/circleci-rpm-builder:master
+    - image: objectrocket/circleci-rpm-builder:bis-rpm
       auth:
         username: $DOCKER_USER
         password: $DOCKER_PASS
@@ -31,10 +31,6 @@ jobs:
     working_directory: ~/repo
 
     steps:
-    - add_ssh_keys:
-            fingerprints:
-              - "d3:78:00:bc:eb:18:dc:cc:15:15:3c:3f:64:9e:ed:0e"
-
     - checkout
 
 
