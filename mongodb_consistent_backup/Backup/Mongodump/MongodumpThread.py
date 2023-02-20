@@ -169,6 +169,7 @@ class MongodumpThread(Process):
             "--out=%s/dump" % self.backup_dir
         ])
         if self.is_version_gte("4.2.0"):
+            logging.info("MongoDump Version higher that 4.2.0 found extending it with compressor flag")
             mongodump_flags.extend([
                 "--compressor=%s" % "snappy"
             ])
@@ -226,6 +227,7 @@ class MongodumpThread(Process):
                 sys.exit(1)
 
         mongodump_cmd.extend(mongodump_flags)
+        logging.info("-----mongodump_cmd: %s" % mongodump_cmd)
         return mongodump_cmd
 
     def run(self):
