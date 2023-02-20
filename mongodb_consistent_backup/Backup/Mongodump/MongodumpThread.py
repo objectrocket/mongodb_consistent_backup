@@ -173,6 +173,8 @@ class MongodumpThread(Process):
             mongodump_flags.extend([
                 "--compressor=%s" % "snappy"
             ])
+        else:
+            logging.info("Mongodump current Version %s is not greator than 4.2.0 " % str(self.version))
 
         # --numParallelCollections
         if self.threads > 0:
