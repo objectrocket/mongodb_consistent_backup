@@ -2,6 +2,7 @@ import json
 import os
 import logging
 import sys
+from distutils.version import LooseVersion
 
 from multiprocessing import Process
 from select import select
@@ -73,10 +74,10 @@ class MongodumpThread(Process):
 
     def is_version_gte(self, compare):
         logging.info("-----check version")
-        logging.info("os.path.isfile(self.binary) %s" % os.path.isfile(self.binary) )
-        logging.info("os.access(self.binary, os.X_OK) %s" % os.access(self.binary, os.X_OK))
+        logging.info("LooseVersion(compare) %s" % LooseVersion(compare) )
+        logging.info("LooseVersion(self.version) %s" % LooseVersion(self.version))
         if os.path.isfile(self.binary) and os.access(self.binary, os.X_OK):
-            if tuple(compare.split(".")) <= tuple(self.version.split(".")):
+            if LooseVersion(compare) <= LooseVersion(self.version):
                 return True
         return False
 
