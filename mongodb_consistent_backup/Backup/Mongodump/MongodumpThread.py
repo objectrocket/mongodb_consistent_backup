@@ -72,6 +72,9 @@ class MongodumpThread(Process):
         return parse_config_bool(self.config.ssl.insecure)
 
     def is_version_gte(self, compare):
+        logging.info("-----check version")
+        logging.info("os.path.isfile(self.binary) %s" % os.path.isfile(self.binary) )
+        logging.info("os.access(self.binary, os.X_OK) %s %s" % os.access(self.binary, os.X_OK), self.binary)
         if os.path.isfile(self.binary) and os.access(self.binary, os.X_OK):
             if tuple(compare.split(".")) <= tuple(self.version.split(".")):
                 return True
