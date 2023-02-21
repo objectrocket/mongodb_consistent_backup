@@ -73,9 +73,6 @@ class MongodumpThread(Process):
         return parse_config_bool(self.config.ssl.insecure)
 
     def is_version_gte(self, compare):
-        logging.info("-----check version")
-        logging.info("LooseVersion(compare) %s" % LooseVersion(compare) )
-        logging.info("LooseVersion(self.version) %s" % LooseVersion(self.version))
         if os.path.isfile(self.binary) and os.access(self.binary, os.X_OK):
             if LooseVersion(compare) <= LooseVersion(self.version):
                 return True
@@ -173,12 +170,10 @@ class MongodumpThread(Process):
             "--out=%s/dump" % self.backup_dir
         ])
         if self.is_version_gte("4.2.0"):
-            logging.info("MongoDump Version higher that 4.2.0 found extending it with compressor flag")
+            logging.info("MongoDump Version higher that 4.2.0 found extendingmongodump with snappy compressor flag")
             mongodump_flags.extend([
                 "--compressor=%s" % "snappy"
             ])
-        else:
-            logging.info("Mongodump current Version %s is not greator than 4.2.0 " % str(self.version))
 
         # --numParallelCollections
         if self.threads > 0:
