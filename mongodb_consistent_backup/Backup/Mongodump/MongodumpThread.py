@@ -149,13 +149,13 @@ class MongodumpThread(Process):
             if self.is_version_gte("4.2.0"):
                 if self.authdb and self.authdb != "admin":
                     logging.debug("Using database %s for authentication" % self.authdb)
-                    auth_details["authdb"]=self.authdb
+                    auth_details['authdb']=self.authdb
                 else:
-                    auth_details["authdb"]="admin"
+                    auth_details['authdb']="admin"
                 if self.user and self.password:
                 # >= 3.0.2 supports password input via stdin to mask from ps
-                    auth_details["user"]=self.user
-                    auth_details["password"]=self.password
+                    auth_details['user']=self.user
+                    auth_details['password']=self.password
                 return auth_details
             elif self.is_version_gte("3.0.2"):
                 if self.authdb and self.authdb != "admin":
@@ -192,7 +192,7 @@ class MongodumpThread(Process):
         ## TODO we can support compress with srv too ,but as of 22feb we donot require the feature can be a point for improvement
         elif self.is_version_gte("4.2.0"):
             auth_details=self.auth_db_insert(mongodump_flags)
-            parsed_uri = "mongodb://%s:%s@%s/?authSource=%s&compressors=snappy&readPreference=secondary" % (auth_details['user'], auth_details['password'], mongodump_uri.host,auth_details['authdb'])
+            parsed_uri = "mongodb://'%s':'%s'@%s/?authSource=%s&compressors=snappy&readPreference=secondary" % (auth_details['user'], auth_details['password'], mongodump_uri.host,auth_details['authdb'])
             mongodump_flags.extend([
             "--host=%s" % parsed_uri,
             ])
