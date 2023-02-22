@@ -192,9 +192,9 @@ class MongodumpThread(Process):
         ## TODO we can support compress with srv too ,but as of 22feb we donot require the feature can be a point for improvement
         elif self.is_version_gte("4.2.0"):
             auth_details=self.auth_db_insert(mongodump_flags)
-            parsed_uri = "mongodb://'%s':'%s'@%s/?authSource=%s&compressors=snappy&readPreference=secondary" % (auth_details['user'], auth_details['password'], mongodump_uri.host,auth_details['authdb'])
+            parsed_uri = "mongodb://%s:%s@%s/?authSource=%s&compressors=snappy&readPreference=secondary" % (auth_details['user'], auth_details['password'], mongodump_uri.host,auth_details['authdb'])
             mongodump_flags.extend([
-            "--host=%s" % parsed_uri,
+            "--uri=%s" % parsed_uri,
             ])
         else:
             mongodump_flags.extend([
