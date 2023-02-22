@@ -193,7 +193,7 @@ class MongodumpThread(Process):
         elif self.is_version_gte("4.2.0"):
             mongo_url_port=":".join([mongodump_uri.host ,str(mongodump_uri.port)])
             auth_details=self.auth_db_insert(mongodump_flags)
-            parsed_uri = 'mongodb://%s:%s@%s/?authSource=%s&compressors=snappy&readPreference=secondary' % (urllib.quote_plus(auth_details['user']), urllib.quote_plus(auth_details['password']), mongo_url_port, auth_details['authdb'])
+            parsed_uri = 'mongodb://%s:%s@%s/?authSource=%s&compressors=snappy,zlib,zstd&readPreference=secondary' % (urllib.quote_plus(auth_details['user']), urllib.quote_plus(auth_details['password']), mongo_url_port, auth_details['authdb'])
             mongodump_flags.extend([
             "--uri=%s" % parsed_uri,
             ])
