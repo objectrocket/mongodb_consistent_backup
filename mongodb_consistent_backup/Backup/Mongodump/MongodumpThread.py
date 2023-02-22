@@ -3,8 +3,7 @@ import os
 import logging
 import sys
 from distutils.version import LooseVersion
-
-import urllib.parse
+import urllib
 from multiprocessing import Process
 from select import select
 from shutil import rmtree
@@ -155,8 +154,8 @@ class MongodumpThread(Process):
                     auth_details['authdb']="admin"
                 if self.user and self.password:
                 # >= 3.0.2 supports password input via stdin to mask from ps
-                    auth_details['user']=urllib.parse.quote_plus(self.user)
-                    auth_details['password']=urllib.parse.quote_plus(self.password)
+                    auth_details['user']=urllib.quote_plus(self.user)
+                    auth_details['password']=urllib.quote_plus(self.password)
                 return auth_details
             elif self.is_version_gte("3.0.2"):
                 if self.authdb and self.authdb != "admin":
