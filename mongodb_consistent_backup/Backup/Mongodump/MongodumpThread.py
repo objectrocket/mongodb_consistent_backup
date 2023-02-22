@@ -195,7 +195,7 @@ class MongodumpThread(Process):
             auth_details=self.auth_db_insert(mongodump_flags)
             parsed_uri = 'mongodb://%s:%s@%s/?authSource=%s&compressors=snappy&readPreference=secondary' % (urllib.quote_plus(auth_details['user']), urllib.quote_plus(auth_details['password']), mongodump_uri.host,auth_details['authdb'])
             mongodump_flags.extend([
-            "--host=%s" % parsed_uri,
+            "--uri=%s" % parsed_uri,
             ])
         else:
             mongodump_flags.extend([
