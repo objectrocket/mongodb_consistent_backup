@@ -150,6 +150,8 @@ class MongodumpThread(Process):
                 if self.authdb and self.authdb != "admin":
                     logging.debug("Using database %s for authentication" % self.authdb)
                     auth_details["authdb"]=self.authdb
+                else:
+                    auth_details["authdb"]="admin"
                 if self.user and self.password:
                 # >= 3.0.2 supports password input via stdin to mask from ps
                     auth_details["user"]=self.user
