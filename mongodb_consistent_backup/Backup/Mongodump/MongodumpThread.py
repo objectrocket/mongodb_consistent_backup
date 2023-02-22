@@ -144,6 +144,38 @@ class MongodumpThread(Process):
         finally:
             self._process.communicate()
 
+    def auth_db_insert(self, mongodump_flags,auth_details=dict()):
+        # --username/--password/--authdb
+            if self.is_version_gte("4.2.0"):
+                if self.authdb and self.authdb != "admin":
+                    logging.debug("Using database %s for authentication" % self.authdb)
+                    auth_details["authdb"]=self.authdb
+                if self.user and self.password:
+                # >= 3.0.2 supports password input via stdin to mask from ps
+                    auth_details["user"]=self.user
+                    auth_details["password"]=self.password
+                return auth_details
+            elif self.is_version_gte("3.0.2"):
+                if self.authdb and self.authdb != "admin":
+                    mongodump_flags.append("--authenticationDatabase=%s" % self.authdb)
+                if self.user and self.password:
+                    mongodump_flags.extend([
+                        "--username=%s" % self.user,
+                        "--password=\"\""
+                    ])
+                    self.do_stdin_passwd = True
+                return mongodump_flags
+            else:
+                if self.authdb and self.authdb != "admin":
+                    mongodump_flags.append("--authenticationDatabase=%s" % self.authdb)
+                if self.user and self.password:
+                    logging.warning("Mongodump is too old to set password securely! Upgrade to mongodump >= 3.0.2 to resolve this")
+                    mongodump_flags.extend([
+                        "--username=%s" % self.user,
+                        "--password=%s" % self.password
+                    ])
+                return mongodump_flags
+
     def mongodump_cmd(self):
         mongodump_uri   = self.uri.get()
         mongodump_cmd   = [self.binary]
@@ -155,12 +187,21 @@ class MongodumpThread(Process):
                 logging.fatal("Mongodump must be >= 3.6.0 to use mongodb+srv:// URIs")
                 sys.exit(1)
             mongodump_flags.append("--host=%s" % self.uri.url)
+        ## TODO we can support compress with srv too ,but as of 22feb we donot require the feature can be a point for improvement
+        elif:
+            if self.is_version_gte("4.2.0"):
+                auth_details=self.auth_db_insert(mongodump_flags)
+                parsed_uri = "mongodb://%s:%s@%s/?authSource=%s&compressors=snappy&readPreference=secondary" % (auth_details['user'], auth_details['password'], mongodump_uri.host,auth_details['authdb'])
+                mongodump_flags.extend([
+                "--host=%s" % parsed_uri,
+                ])
         else:
             mongodump_flags.extend([
                 "--host=%s" % mongodump_uri.host,
                 "--port=%s" % str(mongodump_uri.port)
             ])
 
+        
         if self.oplog_enabled_parse():
           mongodump_flags.extend([
               "--oplog"
@@ -192,24 +233,11 @@ class MongodumpThread(Process):
             logging.fatal("Mongodump must be >= 3.2.0 to set read preference!")
             sys.exit(1)
 
-        # --username/--password/--authdb
-        if self.authdb and self.authdb != "admin":
-            logging.debug("Using database %s for authentication" % self.authdb)
-            mongodump_flags.append("--authenticationDatabase=%s" % self.authdb)
-        if self.user and self.password:
-            # >= 3.0.2 supports password input via stdin to mask from ps
-            if self.is_version_gte("3.0.2"):
-                mongodump_flags.extend([
-                    "--username=%s" % self.user,
-                    "--password=\"\""
-                ])
-                self.do_stdin_passwd = True
-            else:
-                logging.warning("Mongodump is too old to set password securely! Upgrade to mongodump >= 3.0.2 to resolve this")
-                mongodump_flags.extend([
-                    "--username=%s" % self.user,
-                    "--password=%s" % self.password
-                ])
+        if not self.is_version_gte("4.2.0"):
+            # this will add auth to non srv url and which are above 4.2.0
+            mongodump_flags=self.auth_db_insert(mongodump_flags)
+
+
 
         # --ssl
         if self.do_ssl():
@@ -230,7 +258,7 @@ class MongodumpThread(Process):
         mongodump_cmd.extend(mongodump_flags)
         logging.info("-----mongodump_cmd: %s" % mongodump_cmd)
         return mongodump_cmd
-
+    
     def run(self):
         logging.info("Starting mongodump backup of %s" % self.uri)
 
