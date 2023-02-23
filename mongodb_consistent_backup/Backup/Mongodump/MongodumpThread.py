@@ -2,6 +2,7 @@ import json
 import os
 import logging
 import sys
+from distutils.version import LooseVersion
 
 from multiprocessing import Process
 from select import select
@@ -73,7 +74,7 @@ class MongodumpThread(Process):
 
     def is_version_gte(self, compare):
         if os.path.isfile(self.binary) and os.access(self.binary, os.X_OK):
-            if tuple(compare.split(".")) <= tuple(self.version.split(".")):
+            if LooseVersion(compare) <= LooseVersion(self.version):
                 return True
         return False
 
@@ -168,6 +169,12 @@ class MongodumpThread(Process):
         mongodump_flags.extend([
             "--out=%s/dump" % self.backup_dir
         ])
+        if self.is_version_gte("4.2.0"):
+            logging.info("MongoDump Version higher that 4.2.0 found extending mongodump with snppy compressor flag")
+            ## https://www.mongodb.com/docs/drivers/node/v4.4/fundamentals/connection/network-compression/
+            mongodump_flags.extend([
+                "--compressors=%s" % "snappy,zlib,zstd"
+            ])
 
         # --numParallelCollections
         if self.threads > 0:
@@ -222,6 +229,7 @@ class MongodumpThread(Process):
                 sys.exit(1)
 
         mongodump_cmd.extend(mongodump_flags)
+        logging.info("-----mongodump_cmd: %s" % mongodump_cmd)
         return mongodump_cmd
 
     def run(self):

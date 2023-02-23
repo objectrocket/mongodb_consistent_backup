@@ -109,8 +109,8 @@ if [ -d ${srcdir} ]; then
 		exit 1
 	fi
 
-	# build fails on Pex 1.5+
-	${venvdir}/bin/python2.7 ${venvdir}/bin/pip install ${pip_flags} "pex<=1.4"
+	# build work with pex<=2.1.120 as of 23 feb 2023 
+	${venvdir}/bin/python2.7 ${venvdir}/bin/pip install ${pip_flags} "pex<=2.1.120"
 	if [ $? -gt 0 ]; then
 		echo "Failed to install pex utility for building!"
 		exit 1
