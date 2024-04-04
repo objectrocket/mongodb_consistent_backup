@@ -173,7 +173,7 @@ class MongodumpThread(Process):
             logging.info("MongoDump Version higher that 4.2.0 found extending mongodump with snppy compressor flag")
             ## https://www.mongodb.com/docs/drivers/node/v4.4/fundamentals/connection/network-compression/
             mongodump_flags.extend([
-                "--compressors=%s" % "snappy,zlib,zstd"
+                "--compressors=%s" % "zstd,snappy,zlib"
             ])
 
         # --numParallelCollections

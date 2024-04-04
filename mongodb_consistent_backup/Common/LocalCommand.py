@@ -7,11 +7,14 @@ from mongodb_consistent_backup.Errors import Error, OperationError
 
 
 class LocalCommand:
-    def __init__(self, command, command_flags=None, verbose=False):
+    def __init__(self, command, command_flags=None, admin_cmd_flags=None, verbose=False):
         if command_flags is None:
             command_flags = []
+        if admin_command_flags is None:
+            admin_command_flags = []
         self.command       = command
         self.command_flags = command_flags
+        self.admin_command_flags = command_flags
         self.verbose       = verbose
 
         self.output   = []
@@ -20,6 +23,10 @@ class LocalCommand:
         self.command_line = [self.command]
         if len(self.command_flags):
             self.command_line.extend(self.command_flags)
+
+        self.admin_command_line = [self.command]
+        if len(self.admin_command_flags):
+            self.admin_command_line.extend(self.command_flags)
 
     def parse_output(self):
         if self._process:
@@ -36,7 +43,7 @@ class LocalCommand:
 
     def run(self):
         try:
-            self._process = Popen(self.command_line, stdout=PIPE, stderr=PIPE)
+            self._process = Popen(self.command_line+" && "+ self.admin_command_line, stdout=PIPE, stderr=PIPE)
             while self._process.poll() is None:
                 self.parse_output()
                 sleep(0.1)
