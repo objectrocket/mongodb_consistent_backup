@@ -1,6 +1,7 @@
 import os
 import logging
 
+
 from mongodb_consistent_backup.Common import LocalCommand
 from mongodb_consistent_backup.Pipeline import PoolThread
 
@@ -31,7 +32,12 @@ class TarThread(PoolThread):
                     print("outputfile ",self.output_file)
                     backup_base_dir  = os.path.dirname(self.backup_dir)
                     backup_base_name = os.path.basename(self.backup_dir)
-                    admin_backup_file = "_".join("admin",self.output_file)
+                    output_file_dir = os.path.dirname(self.output_file)
+                    output_file_basename= os.path.basename(self.output_file)
+                    admin_backup_file = output_file_dir +"_".join("admin",output_file_basename)
+                    print(output_file_dir)
+                    print(output_file_basename)
+                    print(admin_backup_file)
 
                     log_msg   = "Archiving directory: %s" % self.backup_dir
                     cmd_flags = ["-C", backup_base_dir, "-c", "-f", self.output_file, "--exclude", "admin" ,"--remove-files"]
