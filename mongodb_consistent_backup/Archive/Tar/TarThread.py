@@ -33,7 +33,7 @@ class TarThread(PoolThread):
                     backup_base_name = os.path.basename(self.backup_dir)
                     output_file_dir = os.path.dirname(self.output_file)
                     output_file_basename= os.path.basename(self.output_file)
-                    admin_backup_file = output_file_dir +"_".join(["admin",output_file_basename])
+                    admin_backup_file = output_file_dir+"/" +"_".join(["admin",output_file_basename])
                     print(admin_backup_file)
 
 
