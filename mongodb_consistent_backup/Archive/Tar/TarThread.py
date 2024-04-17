@@ -36,8 +36,8 @@ class TarThread(PoolThread):
                     admin_backup_file = output_file_dir+"/" +"_".join(["admin",output_file_basename])
 
                     log_msg   = "Archiving directory: %s" % self.backup_dir
-                    cmd_flags = ["--exclude", "admin" ,"-C", backup_base_dir, "-c", "-f", self.output_file, ]
-                    admin_command_flags = ["-C", backup_base_dir, "-c", "-f", admin_backup_file,]
+                    cmd_flags = ["--exclude", "admin" ,"-C", backup_base_dir, "-c", "-f", self.output_file, "--remove-files"]
+                    admin_command_flags = ["-C", backup_base_dir, "-c", "-f", admin_backup_file, "--remove-files"]
                     
 
                     if self.do_gzip():
