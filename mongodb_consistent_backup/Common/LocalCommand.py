@@ -45,7 +45,7 @@ class LocalCommand:
         try:
             print(self.command_line)
             print(self.admin_command_line)
-            self._process = Popen(self.command_line+" && "+ self.admin_command_line, stdout=PIPE, stderr=PIPE)
+            self._process = Popen(self.command_line+["&&"]+ self.admin_command_line, stdout=PIPE, stderr=PIPE)
             while self._process.poll() is None:
                 self.parse_output()
                 sleep(0.1)
