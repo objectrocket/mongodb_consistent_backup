@@ -29,15 +29,12 @@ class TarThread(PoolThread):
         if os.path.isdir(self.backup_dir):
             if not os.path.isfile(self.output_file):
                 try:
-                    print("outputfile ",self.output_file)
                     backup_base_dir  = os.path.dirname(self.backup_dir)
                     backup_base_name = os.path.basename(self.backup_dir)
                     output_file_dir = os.path.dirname(self.output_file)
                     output_file_basename= os.path.basename(self.output_file)
-                    print("output_file_dir",output_file_dir)
-                    print(output_file_basename)
+                    admin_backup_file = output_file_dir +"_".join(["admin",output_file_basename])
                     print(admin_backup_file)
-                    admin_backup_file = output_file_dir +"_".join("admin",output_file_basename)
 
 
                     log_msg   = "Archiving directory: %s" % self.backup_dir
