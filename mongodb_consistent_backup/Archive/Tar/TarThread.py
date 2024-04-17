@@ -34,8 +34,6 @@ class TarThread(PoolThread):
                     output_file_dir = os.path.dirname(self.output_file)
                     output_file_basename= os.path.basename(self.output_file)
                     admin_backup_file = output_file_dir+"/" +"_".join(["admin",output_file_basename])
-                    print(admin_backup_file)
-
 
                     log_msg   = "Archiving directory: %s" % self.backup_dir
                     cmd_flags = ["-C", backup_base_dir, "-c", "-f", self.output_file, "--exclude", "admin" ,"--remove-files"]
