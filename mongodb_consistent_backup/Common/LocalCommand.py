@@ -26,7 +26,7 @@ class LocalCommand:
 
         self.admin_command_line = [self.command]
         if len(self.admin_command_flags):
-            self.admin_command_line.extend(self.command_flags)
+            self.admin_command_line.extend(self.admin_command_flags)
 
     def parse_output(self):
         if self._process:
