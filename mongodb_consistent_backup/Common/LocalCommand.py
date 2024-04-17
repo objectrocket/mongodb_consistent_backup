@@ -7,7 +7,7 @@ from mongodb_consistent_backup.Errors import Error, OperationError
 
 
 class LocalCommand:
-    def __init__(self, command, command_flags=None, admin_cmd_flags=None, verbose=False):
+    def __init__(self, command, command_flags=None, admin_command_flags=None, verbose=False):
         if command_flags is None:
             command_flags = []
         if admin_command_flags is None:

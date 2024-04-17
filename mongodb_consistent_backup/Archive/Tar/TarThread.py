@@ -35,18 +35,18 @@ class TarThread(PoolThread):
 
                     log_msg   = "Archiving directory: %s" % self.backup_dir
                     cmd_flags = ["-C", backup_base_dir, "-c", "-f", self.output_file, "--exclude", "admin" ,"--remove-files"]
-                    admin_cmd_flags = ["-C", backup_base_dir, "-c", "-f", admin_backup_file, "admin", "--remove-files"]
+                    admin_command_flags = ["-C", backup_base_dir, "-c", "-f", admin_backup_file, "admin", "--remove-files"]
                     
 
                     if self.do_gzip():
                         log_msg = "Archiving and compressing directory: %s" % self.backup_dir
                         cmd_flags.append("-z")
-                        admin_cmd_flags.append("-z")
+                        admin_command_flags.append("-z")
 
                     cmd_flags.append(backup_base_name)
                     logging.info(log_msg)
                     self.running  = True
-                    self._command = LocalCommand(self.binary, cmd_flags, admin_cmd_flags, self.verbose)
+                    self._command = LocalCommand(self.binary, cmd_flags, admin_command_flags, self.verbose)
                     self.exit_code = self._command.run()
                 except Exception, e:
                     return self.result(False, "Failed archiving file: %s!" % self.output_file, e)
