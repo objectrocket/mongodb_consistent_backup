@@ -37,7 +37,7 @@ class TarThread(PoolThread):
                     if self.do_gzip():
                         log_msg = "Archiving and compressing directory: %s" % self.backup_dir
                         cmd_flags.append(backup_base_name)
-                        additional_flags = ["|", "gzip", "--fast", ">", self.output_file]
+                        additional_flags = ["|", "gzip", "-1", ">", self.output_file]
                         cmd_flags.extend(additional_flags)
                     else:
                         cmd_flags.append(backup_base_name)
