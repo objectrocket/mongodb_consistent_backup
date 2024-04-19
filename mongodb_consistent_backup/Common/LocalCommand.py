@@ -43,7 +43,8 @@ class LocalCommand:
 
     def run(self):
         try:
-            print(" ".join(self.admin_command_line+ ["&&"]+ self.command_line))
+            print("cmd : ")
+            print(" ".join( self.admin_command_line+ ["&&"]+ self.command_line))
             cmd = " ".join(self.admin_command_line+ ["&&"]+ self.command_line)
             self._process = Popen(cmd, stdout=PIPE, stderr=PIPE,shell= True)
             while self._process.poll() is None:
