@@ -5,7 +5,6 @@ from time import sleep
 
 from mongodb_consistent_backup.Errors import Error, OperationError
 
-
 class LocalCommand:
     def __init__(self, command, command_flags=None, verbose=False):
         if command_flags is None:
@@ -16,8 +15,10 @@ class LocalCommand:
 
         self.output   = []
         self._process = None
+        self.compression_level = -1
+        self.gzip = f"GZIP_OPT={self.compression_level}"
 
-        self.command_line = [self.command]
+        self.command_line = [self.gzip, self.command]
         if len(self.command_flags):
             self.command_line.extend(self.command_flags)
 
