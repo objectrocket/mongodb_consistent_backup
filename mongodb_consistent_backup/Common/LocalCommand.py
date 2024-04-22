@@ -16,7 +16,7 @@ class LocalCommand:
         self.output   = []
         self._process = None
         self.compression_level = -1
-        self.gzip = f"GZIP_OPT={self.compression_level}"
+        self.gzip = "GZIP_OPT="+str(self.compression_level)
 
         self.command_line = [self.gzip, self.command]
         if len(self.command_flags):
