@@ -18,7 +18,7 @@ class LocalCommand:
         self.compression_level = -1
         self.gzip = "GZIP="+str(self.compression_level)
 
-        self.command_line = [self.gzip+ " " +self.command]
+        self.command_line = [self.gzip, self.command] 
         if len(self.command_flags):
             self.command_line.extend(self.command_flags)
 
@@ -38,7 +38,9 @@ class LocalCommand:
     def run(self):
         try:
             print(self.command_line)
-            self._process = Popen(self.command_line, stdout=PIPE, stderr=PIPE)
+            print(" ".join(self.command_line))
+            cmd = " ".join(self.command_line)
+            self._process = Popen(cmd, stdout=PIPE, stderr=PIPE)
             while self._process.poll() is None:
                 self.parse_output()
                 sleep(0.1)
