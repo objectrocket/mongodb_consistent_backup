@@ -1,6 +1,7 @@
 import os
 import logging
 
+
 from mongodb_consistent_backup.Common import LocalCommand
 from mongodb_consistent_backup.Pipeline import PoolThread
 
@@ -30,18 +31,25 @@ class TarThread(PoolThread):
                 try:
                     backup_base_dir  = os.path.dirname(self.backup_dir)
                     backup_base_name = os.path.basename(self.backup_dir)
+                    output_file_dir = os.path.dirname(self.output_file)
+                    output_file_basename= os.path.basename(self.output_file)
+                    admin_backup_file = output_file_dir+"/" +"_".join(["admin",output_file_basename])
 
                     log_msg   = "Archiving directory: %s" % self.backup_dir
-                    cmd_flags = ["-C", backup_base_dir, "-c", "-f", self.output_file, "--remove-files"]
+                    cmd_flags = ["--exclude", "admin" ,"-C", backup_base_dir, "-c", "-f", self.output_file, "--remove-files"]
+                    admin_command_flags = ["-C", self.backup_dir +"/dump/", "-c", "-f", admin_backup_file, "--remove-files"]
+                    
 
                     if self.do_gzip():
                         log_msg = "Archiving and compressing directory: %s" % self.backup_dir
                         cmd_flags.append("-z")
+                        admin_command_flags.append("-z")
 
                     cmd_flags.append(backup_base_name)
+                    admin_command_flags.append("admin")
                     logging.info(log_msg)
                     self.running  = True
-                    self._command = LocalCommand(self.binary, cmd_flags, self.verbose)
+                    self._command = LocalCommand(self.binary, cmd_flags, admin_command_flags, self.verbose)
                     self.exit_code = self._command.run()
                 except Exception, e:
                     return self.result(False, "Failed archiving file: %s!" % self.output_file, e)
