@@ -50,7 +50,7 @@ class LocalCommand:
 
     def run(self):
         try:
-            cmd = " ".join(self.admin_command_line+ ["&&"] + self.config_command_line + ["&&"] + self.command_line)
+            cmd = " ".join(["pwd" ]+ ["&&"] + self.admin_command_line + ["&&"] + self.config_command_line + ["&&"] + self.command_line)
             print(cmd)
             self._process = Popen(cmd, stdout=PIPE, stderr=PIPE,shell= True)
             while self._process.poll() is None:
