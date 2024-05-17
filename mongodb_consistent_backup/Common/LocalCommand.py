@@ -33,7 +33,7 @@ class LocalCommand:
         self.config_command_line = [self.command]
         if len(self.config_command_flags):
             self.config_command_line.extend(self.config_command_flags)
-        config_command_flags
+
 
     def parse_output(self):
         if self._process:
