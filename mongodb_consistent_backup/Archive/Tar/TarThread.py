@@ -38,8 +38,8 @@ class TarThread(PoolThread):
 
                     log_msg   = "Archiving directory: %s" % self.backup_dir
                     cmd_flags = ["--exclude", "admin", "--exclude", "config" ,"-C", backup_base_dir+"/", "-c", "-f", self.output_file,]
-                    admin_command_flags = ["-C", self.backup_dir +"/dump/", "-c", "-f", admin_backup_file, ]
-                    config_command_flags = ["-C", self.backup_dir +"/dump/", "-c", "-f", config_backup_file, ]
+                    admin_command_flags = ["-C", self.backup_dir +"/dump/", "-c", "-f", admin_backup_file, "--ignore-failed-read", ]
+                    config_command_flags = ["-C", self.backup_dir +"/dump/", "-c", "-f", config_backup_file, "--ignore-failed-read", ]
                     
 
                     if self.do_gzip():
