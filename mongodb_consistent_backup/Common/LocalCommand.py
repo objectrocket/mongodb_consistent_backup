@@ -50,8 +50,7 @@ class LocalCommand:
 
     def run(self):
         try:
-            cmd = " ".join(["pwd" ]+ ["&&"] + self.admin_command_line + ["&&"] + self.config_command_line + ["&&"] + self.command_line)
-            print(cmd)
+            cmd = " ".join(["export GZIP=-1" ]+ ["&&"] + self.admin_command_line + ["&&"] + self.config_command_line + ["&&"] + self.command_line)
             self._process = Popen(cmd, stdout=PIPE, stderr=PIPE,shell= True)
             while self._process.poll() is None:
                 self.parse_output()
