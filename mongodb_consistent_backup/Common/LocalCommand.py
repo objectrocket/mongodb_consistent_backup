@@ -7,15 +7,18 @@ from mongodb_consistent_backup.Errors import Error, OperationError
 
 
 class LocalCommand:
-    def __init__(self, command, command_flags=None, admin_command_flags=None, verbose=False):
+    def __init__(self, command, command_flags=None, admin_command_flags=None, config_command_flags=None,verbose=False):
         if command_flags is None:
             command_flags = []
         if admin_command_flags is None:
             admin_command_flags = []
+        if config_command_flags is None:
+            config_command_flags = []
         self.command       = command
         self.command_flags = command_flags
         self.admin_command_flags = admin_command_flags
-        self.verbose       = verbose
+        self.config_command_flags = config_command_flags
+        self.verbose = verbose
 
         self.output   = []
         self._process = None
@@ -27,6 +30,10 @@ class LocalCommand:
         self.admin_command_line = [self.command]
         if len(self.admin_command_flags):
             self.admin_command_line.extend(self.admin_command_flags)
+        self.config_command_line = [self.command]
+        if len(self.config_command_flags):
+            self.config_command_line.extend(self.config_command_flags)
+
 
     def parse_output(self):
         if self._process:
@@ -43,7 +50,7 @@ class LocalCommand:
 
     def run(self):
         try:
-            cmd = " ".join(["export GZIP=-1"]+ ["&&"] +self.admin_command_line+ ["&&"]+ self.command_line)
+            cmd = " ".join(["export GZIP=-1" ]+ ["&&"] + self.admin_command_line + ["&&"] + self.config_command_line + ["&&"] + self.command_line)
             self._process = Popen(cmd, stdout=PIPE, stderr=PIPE,shell= True)
             while self._process.poll() is None:
                 self.parse_output()
