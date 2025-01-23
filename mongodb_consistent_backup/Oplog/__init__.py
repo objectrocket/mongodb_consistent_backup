@@ -14,7 +14,7 @@ def config(parser):
     parser.add_argument("--oplog.resolver.threads", dest="oplog.resolver.threads", default=0, type=int,
                         help="Number of threads to use during resolver step (default: 1-per-CPU)")
     parser.add_argument("--oplog.tailer.enabled", dest="oplog.tailer.enabled", default='false', type=str,
-                        help="Enable/disable capturing of cluster-consistent oplogs, required for cluster-wide PITR (default: true)")
+                        help="Enable/disable capturing of cluster-consistent oplogs, required for cluster-wide PITR (default: false)")
     parser.add_argument("--oplog.tailer.status_interval", dest="oplog.tailer.status_interval", default=30, type=int,
                         help="Number of seconds to wait between reporting oplog tailer status (default: 30)")
     return parser
