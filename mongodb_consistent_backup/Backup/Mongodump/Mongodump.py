@@ -134,7 +134,6 @@ class Mongodump(Task):
                 
                 # Check if mongo_uri passes the check_or_cfg function
                 if self.check_or_cfg(mongo_uri.str()):
-                    self.oplog_enabled = False  # Set oplog_enabled to False if condition is met
                     thread = MongodumpThread(
                         self.states[shard],
                         mongo_uri,
