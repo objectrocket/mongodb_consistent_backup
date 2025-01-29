@@ -13,8 +13,8 @@ def config(parser):
                         help="Number of seconds to wait to flush the backup oplog file, if 'max_docs' is not reached (default: 1)")
     parser.add_argument("--oplog.resolver.threads", dest="oplog.resolver.threads", default=0, type=int,
                         help="Number of threads to use during resolver step (default: 1-per-CPU)")
-    parser.add_argument("--oplog.tailer.enabled", dest="oplog.tailer.enabled", default='false', type=str,
-                        help="Enable/disable capturing of cluster-consistent oplogs, required for cluster-wide PITR (default: false)")
+    parser.add_argument("--oplog.tailer.enabled", dest="oplog.tailer.enabled", default='true', type=str,
+                        help="Enable/disable capturing of cluster-consistent oplogs, required for cluster-wide PITR (default: true)")
     parser.add_argument("--oplog.tailer.status_interval", dest="oplog.tailer.status_interval", default=30, type=int,
                         help="Number of seconds to wait between reporting oplog tailer status (default: 30)")
     return parser
