@@ -133,7 +133,7 @@ class Mongodump(Task):
                 self.states[shard] = OplogState(self.manager, mongo_uri)
                 
                 # Check if mongo_uri passes the check_or_cfg function
-                if check_or_cfg(mongo_uri):
+                if self.check_or_cfg(mongo_uri):
                     self.oplog_enabled = False  # Set oplog_enabled to False if condition is met
 
 
@@ -186,8 +186,7 @@ class Mongodump(Task):
             logging.info("Stopped all mongodump threads")
             self.stopped = True
     
-    @staticmethod
-    def check_or_cfg(uri):
+    def check_or_cfg(self, uri):
         rs, domain = uri.split("/", 1)
         if "objectrocket.com" in domain and "cfg" in domain:
             return True
