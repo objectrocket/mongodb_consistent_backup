@@ -135,19 +135,29 @@ class Mongodump(Task):
                 # Check if mongo_uri passes the check_or_cfg function
                 if self.check_or_cfg(mongo_uri.str()):
                     self.oplog_enabled = False  # Set oplog_enabled to False if condition is met
-
-
-                thread = MongodumpThread(
-                    self.states[shard],
-                    mongo_uri,
-                    self.timer,
-                    self.config,
-                    self.backup_dir,
-                    self.version,
-                    self.threads(),
-                    self.do_gzip(),
-                    self.oplog_enabled
-                )
+                    thread = MongodumpThread(
+                        self.states[shard],
+                        mongo_uri,
+                        self.timer,
+                        self.config,
+                        self.backup_dir,
+                        self.version,
+                        self.threads(),
+                        self.do_gzip(),
+                        False
+                    )
+                else:
+                    thread = MongodumpThread(
+                        self.states[shard],
+                        mongo_uri,
+                        self.timer,
+                        self.config,
+                        self.backup_dir,
+                        self.version,
+                        self.threads(),
+                        self.do_gzip(),
+                        self.oplog_enabled
+                    )
                 self.dump_threads.append(thread)
             except Exception, e:
                 logging.error("Failed to get secondary for shard %s: %s" % (shard, e))
