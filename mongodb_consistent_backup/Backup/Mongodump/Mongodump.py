@@ -139,15 +139,15 @@ class Mongodump(Task):
                     logging.info("No Oplog for %s as it belongs to objectrocket.com" % (mongo_uri.str()))
 
                 thread = MongodumpThread(
-                        self.states[shard],
-                        mongo_uri,
-                        self.timer,
-                        self.config,
-                        self.backup_dir,
-                        self.version,
-                        self.threads(),
-                        self.do_gzip(),
-                        oplog
+                    self.states[shard],
+                    mongo_uri,
+                    self.timer,
+                    self.config,
+                    self.backup_dir,
+                    self.version,
+                    self.threads(),
+                    self.do_gzip(),
+                    oplog
                 )
                 self.dump_threads.append(thread)
             except Exception, e:
