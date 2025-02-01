@@ -131,6 +131,13 @@ class Mongodump(Task):
                 secondary = self.replsets[shard].find_secondary()
                 mongo_uri = secondary['uri']
                 self.states[shard] = OplogState(self.manager, mongo_uri)
+                
+                # Check if mongo_uri passes the check_or_cfg function
+                oplog = self.oplog_enabled
+                if self.check_or_cfg(mongo_uri.str()):
+                    oplog = False
+                    logging.info("No Oplog for %s as it belongs to objectrocket.com" % (mongo_uri.str()))
+
                 thread = MongodumpThread(
                     self.states[shard],
                     mongo_uri,
@@ -140,7 +147,7 @@ class Mongodump(Task):
                     self.version,
                     self.threads(),
                     self.do_gzip(),
-                    self.oplog_enabled
+                    oplog
                 )
                 self.dump_threads.append(thread)
             except Exception, e:
@@ -179,3 +186,21 @@ class Mongodump(Task):
                 pass
             logging.info("Stopped all mongodump threads")
             self.stopped = True
+    
+    def check_or_cfg(self, uri):
+        """
+        Checks whether the given URI contains the domain 'objectrocket.com' 
+        and the substring 'cfg' within the domain.
+    
+        Args:
+            uri (str): The URI to be checked, typically in the form of 'rs/domain.com'.
+    
+        Returns:
+            bool: 
+                - True if the URI contains the domain 'objectrocket.com' and 'cfg' in the domain part.
+                - False otherwise
+        """
+        rs, domain = uri.split("/", 1)
+        if "objectrocket.com" in domain and "cfg" in domain:
+            return True
+        return False
