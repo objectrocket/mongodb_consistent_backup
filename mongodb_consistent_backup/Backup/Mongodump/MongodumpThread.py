@@ -123,7 +123,7 @@ class MongodumpThread(Process):
     def wait(self):
         try:
             while self._process.stderr:
-                poll = select([self._process.stderr.fileno()], [], [])
+                poll = select([self._process.stderr.fileno()], [], [], 1)
                 if len(poll) >= 1:
                     for fd in poll[0]:
                         read = self._process.stderr.readline()
