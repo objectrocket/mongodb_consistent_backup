@@ -133,9 +133,8 @@ class Mongodump(Task):
                 self.states[shard] = OplogState(self.manager, mongo_uri)
                 
                 # Check if mongo_uri passes the check_or_cfg function
-                oplog = self.oplog_enabled
                 if self.check_or_cfg(mongo_uri.str()):
-                    oplog = False
+                    self.oplog_enabled = False
                     logging.info("No Oplog for %s as it belongs to objectrocket.com" % (mongo_uri.str()))
 
                 thread = MongodumpThread(
@@ -147,7 +146,7 @@ class Mongodump(Task):
                     self.version,
                     self.threads(),
                     self.do_gzip(),
-                    oplog
+                    self.oplog_enabled
                 )
                 self.dump_threads.append(thread)
             except Exception, e:
