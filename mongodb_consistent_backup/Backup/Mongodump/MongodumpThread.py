@@ -151,8 +151,8 @@ class MongodumpThread(Process):
         except Exception, e:
             logging.exception("Error reading mongodump output: %s" % e)
         finally:
-            self._process.communicate()        
-    
+            self._process.communicate()
+
     def mongodump_cmd(self):
         mongodump_uri   = self.uri.get()
         mongodump_cmd   = [self.binary]
