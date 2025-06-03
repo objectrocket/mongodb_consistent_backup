@@ -122,21 +122,30 @@ class MongodumpThread(Process):
 
     def wait(self):
         try:
-            while self._process.stderr:
-                poll = select([self._process.stderr.fileno()], [], [])
-                if len(poll) >= 1:
-                    for fd in poll[0]:
+            while self._process.stderr and not self._process.stderr.closed:
+                read = None
+                fd = self._process.stderr.fileno()
+                if fd >= 1024:
+                    read = self._process.stderr.readline()
+                else:
+                    poll = select([fd], [], [])
+                    if poll[0]:
                         read = self._process.stderr.readline()
-                        line = self.parse_mongodump_line(read)
-                        if not line:
-                            continue
-                        elif self.is_password_prompt(read):
-                            self.handle_password_prompt()
-                        elif self.is_failed_line(read):
-                            self.handle_failure(read)
-                            break
-                        else:
-                            logging.info(line)
+
+                if read is not None:
+                    if not read:
+                        break
+                    line = self.parse_mongodump_line(read)
+                    if not line:
+                        continue
+                    elif self.is_password_prompt(read):
+                        self.handle_password_prompt()
+                    elif self.is_failed_line(read):
+                        self.handle_failure(read)
+                        break
+                    else:
+                        logging.info(line)
+
                 if self._process.poll() is not None:
                     break
         except Exception, e:
