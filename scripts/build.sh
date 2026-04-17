@@ -103,14 +103,31 @@ if [ -d ${srcdir} ]; then
 	pip_flags="--download-cache=${pipdir}"
 	${venvdir}/bin/python2.7 ${venvdir}/bin/pip --help | grep -q '\-\-cache\-dir'
 	[ $? = 0 ] && pip_flags="--cache-dir=${pipdir}"
-	${venvdir}/bin/python2.7 ${venvdir}/bin/pip install ${pip_flags} "requests"
+
+	# Keep the Python 2 build bootstrap deterministic. Modern releases of these
+	# tools no longer support Python 2, and older pip builds do not always
+	# resolve the last compatible versions correctly.
+	bootstrap_pip=${BOOTSTRAP_PIP_VERSION:-pip<21}
+	bootstrap_setuptools=${BOOTSTRAP_SETUPTOOLS_VERSION:-setuptools<45}
+	bootstrap_wheel=${BOOTSTRAP_WHEEL_VERSION:-wheel<0.38}
+	bootstrap_requests=${BOOTSTRAP_REQUESTS_VERSION:-requests==2.27.1}
+	bootstrap_pex=${BOOTSTRAP_PEX_VERSION:-pex==2.1.120}
+
+	${venvdir}/bin/python2.7 ${venvdir}/bin/pip install ${pip_flags} \
+		"${bootstrap_pip}" "${bootstrap_setuptools}" "${bootstrap_wheel}"
+	if [ $? -gt 0 ]; then
+		echo "Failed to pin Python 2 build tooling (pip/setuptools/wheel)!"
+		exit 1
+	fi
+
+	${venvdir}/bin/python2.7 ${venvdir}/bin/pip install ${pip_flags} "${bootstrap_requests}"
 	if [ $? -gt 0 ]; then
 		echo "Failed to install 'requests'!"
 		exit 1
 	fi
 
-	# build work with pex<=2.1.120 as of 23 feb 2023 
-	${venvdir}/bin/python2.7 ${venvdir}/bin/pip install ${pip_flags} "pex<=2.1.120"
+	# PEX 2.1.120 is the last known-good version for this Python 2 build flow.
+	${venvdir}/bin/python2.7 ${venvdir}/bin/pip install ${pip_flags} "${bootstrap_pex}"
 	if [ $? -gt 0 ]; then
 		echo "Failed to install pex utility for building!"
 		exit 1
