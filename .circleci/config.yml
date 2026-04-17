@@ -36,41 +36,20 @@ jobs:
     - run:
         name: set version and build the rpm
         command: |
-          set -xeuo pipefail
+          set -x
           version=$(cat VERSION)
-          build_version="${version}.${CIRCLE_BUILD_NUM}"
-          echo "${build_version}" > VERSION
+          echo "${version}.${CIRCLE_BUILD_NUM}" > VERSION
           make rpm
 
           git config user.email "dev@objectrocket.com"
           git config user.name "objectrocketdev"
+          git tag -a $(cat VERSION) -m "Tagged by ${CIRCLE_BUILD_URL}" HEAD
+          rpm -qa | grep ssh
+          rpm -ql libssh2-1.4.2-2.el6_7.1.x86_64
+          git push --tags origin
 
-          if git rev-parse -q --verify "refs/tags/${build_version}" >/dev/null; then
-            echo "Git tag ${build_version} already exists locally; skipping tag creation."
-          else
-            git tag -a "${build_version}" -m "Tagged by ${CIRCLE_BUILD_URL}" HEAD
-          fi
-
-          rpm -qa | grep ssh || true
-          libssh2_pkg=$(rpm -q libssh2 2>/dev/null || true)
-          if [ -n "${libssh2_pkg}" ]; then
-            rpm -ql "${libssh2_pkg}"
-          fi
-
-          if git ls-remote --exit-code --tags origin "refs/tags/${build_version}" >/dev/null 2>&1; then
-            echo "Git tag ${build_version} already exists on origin; skipping push."
-          else
-            git push origin "refs/tags/${build_version}"
-          fi
-
-          mkdir -p mongodb_consistent_backup_rpm
-          built_rpm=$(find build/rpm/RPMS/x86_64 -maxdepth 1 -type f -name "mongodb_consistent_backup-${build_version}-1.*.x86_64.rpm" | head -n 1)
-          if [ -z "${built_rpm}" ]; then
-            echo "Built RPM for version ${build_version} not found."
-            find build/rpm/RPMS -maxdepth 2 -type f -name '*.rpm'
-            exit 1
-          fi
-          cp "${built_rpm}" mongodb_consistent_backup_rpm/
+          mkdir mongodb_consistent_backup_rpm
+          cp /root/repo/build/rpm/RPMS/x86_64/mongodb_consistent_backup-$(cat VERSION)-1.el6.x86_64.rpm mongodb_consistent_backup_rpm/
 
     - save_cache:
         paths:
@@ -80,3 +59,4 @@ jobs:
     - store_artifacts:
         path: mongodb_consistent_backup_rpm
         destination: mongodb_consistent_backup
+
