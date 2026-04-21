@@ -2,6 +2,9 @@
 
 set -x
 
+pip_verbose_flags="-vvv"
+pex_verbose_flags="-vvv"
+
 readlink_bin=readlink
 cp_bin=cp
 if [[ "`uname`" =~ "Darwin" ]]; then
@@ -103,14 +106,16 @@ if [ -d ${srcdir} ]; then
 	pip_flags="--download-cache=${pipdir}"
 	${venvdir}/bin/python2.7 ${venvdir}/bin/pip --help | grep -q '\-\-cache\-dir'
 	[ $? = 0 ] && pip_flags="--cache-dir=${pipdir}"
-	${venvdir}/bin/python2.7 ${venvdir}/bin/pip install ${pip_flags} "requests"
+	echo "Installing requests with verbose pip logging"
+	${venvdir}/bin/python2.7 ${venvdir}/bin/pip install ${pip_verbose_flags} ${pip_flags} "requests"
 	if [ $? -gt 0 ]; then
 		echo "Failed to install 'requests'!"
 		exit 1
 	fi
 
 	# build work with pex<=2.1.120 as of 23 feb 2023 
-	${venvdir}/bin/python2.7 ${venvdir}/bin/pip install ${pip_flags} "pex<=2.1.120"
+	echo "Installing pex with verbose pip logging"
+	${venvdir}/bin/python2.7 ${venvdir}/bin/pip install ${pip_verbose_flags} ${pip_flags} "pex<=2.1.120"
 	if [ $? -gt 0 ]; then
 		echo "Failed to install pex utility for building!"
 		exit 1
@@ -122,7 +127,8 @@ if [ -d ${srcdir} ]; then
 		find ${pexdir} -type f -name "${mod_name}-*.whl" -delete
 	fi
 	[ ! -d ${bindir} ] && mkdir -p ${bindir}
-	${venvdir}/bin/python2.7 ${venvdir}/bin/pex -o ${output_file} --no-emit-warnings -m ${mod_name} -r ${require_file} --pex-root=${pexdir} ${builddir}
+	echo "Building pex executable with verbose logging"
+	${venvdir}/bin/python2.7 ${venvdir}/bin/pex ${pex_verbose_flags} -o ${output_file} --no-emit-warnings -m ${mod_name} -r ${require_file} --pex-root=${pexdir} ${builddir}
 	if [ $? -lt 1 ] && [ -x ${output_file} ]; then
 		echo "pex executable written to '$output_file'"
 	else

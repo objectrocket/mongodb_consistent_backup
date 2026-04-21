@@ -35,6 +35,7 @@ jobs:
   
     - run:
         name: set version and build the rpm
+        no_output_timeout: 20m
         command: |
           set -x
           version=$(cat VERSION)
@@ -59,4 +60,3 @@ jobs:
     - store_artifacts:
         path: mongodb_consistent_backup_rpm
         destination: mongodb_consistent_backup
-
