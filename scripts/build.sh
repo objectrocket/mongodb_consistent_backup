@@ -29,30 +29,6 @@ require_file=${builddir}/requirements.txt
 version_file=${builddir}/VERSION
 git_commit=${GIT_COMMIT:-unknown}
 
-replace_version_placeholder() {
-	local file_path=$1
-	local resolved_version=$2
-
-	${python_bin} - "$file_path" "$resolved_version" <<'PY'
-import sys
-
-file_path = sys.argv[1]
-resolved_version = sys.argv[2]
-placeholder = "#.#.#"
-
-with open(file_path, "r") as handle:
-    content = handle.read()
-
-if placeholder not in content:
-    sys.stderr.write("Failed to find version placeholder in %s\n" % file_path)
-    sys.exit(1)
-
-with open(file_path, "w") as handle:
-    handle.write(content.replace(placeholder, resolved_version))
-PY
-	return $?
-}
-
 python_bin=${PYTHON_BIN}
 if [ -z "$python_bin" ]; then
 	if [[ "`uname`" =~ "Darwin" ]]; then
@@ -97,22 +73,13 @@ if [ -d ${srcdir} ]; then
 
 	# Replace version number in setup.py and mongodb_consistent_backup/__init__.py with number in VERSION:
 	if [ -f "$version_file" ]; then
-		version=$(tr -d '\r\n' < ${version_file})
+		version=$(cat ${version_file})
 		if [ -z "$version" ]; then
 			echo "Cannot get version from file $version_file!"
 			exit 1
 		else
-			replace_version_placeholder ${builddir}/setup.py ${version}
-			if [ $? -gt 0 ]; then
-				echo "Failed to stamp version into ${builddir}/setup.py!"
-				exit 1
-			fi
-
-			replace_version_placeholder ${builddir}/${mod_name}/__init__.py ${version}
-			if [ $? -gt 0 ]; then
-				echo "Failed to stamp version into ${builddir}/${mod_name}/__init__.py!"
-				exit 1
-			fi
+			sed -i -e s@\#.\#.\#@${version}@g ${builddir}/setup.py
+			sed -i -e s@\#.\#.\#@${version}@g ${builddir}/${mod_name}/__init__.py
 		fi
 	else
 		echo "Cannot find version file $version_file!"
