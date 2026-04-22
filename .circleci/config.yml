@@ -58,4 +58,4 @@ jobs:
 
     - store_artifacts:
         path: mongodb_consistent_backup_rpm
-        destination: mongodb_consistent_backup
+        destination: mongodb_consistent_backup 
