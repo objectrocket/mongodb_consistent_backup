@@ -37,50 +37,20 @@ jobs:
         name: set version and build the rpm
         no_output_timeout: 20m
         command: |
-          set -ex
-
-          heartbeat() {
-            label="$1"
-            while true; do
-              echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] still running: ${label}"
-              sleep 60
-            done
-          }
-
-          run_with_heartbeat() {
-            label="$1"
-            shift
-
-            echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] starting: ${label}"
-            heartbeat "${label}" &
-            heartbeat_pid=$!
-
-            "$@"
-            status=$?
-
-            kill "${heartbeat_pid}" 2>/dev/null || true
-            wait "${heartbeat_pid}" 2>/dev/null || true
-
-            echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] finished: ${label} (exit ${status})"
-            return ${status}
-          }
-
+          set -x
           version=$(cat VERSION)
           echo "${version}.${CIRCLE_BUILD_NUM}" > VERSION
-          run_with_heartbeat "make rpm" make rpm
+          make rpm
 
           git config user.email "dev@objectrocket.com"
           git config user.name "objectrocketdev"
           git tag -a $(cat VERSION) -m "Tagged by ${CIRCLE_BUILD_URL}" HEAD
           rpm -qa | grep ssh
           rpm -ql libssh2-1.4.2-2.el6_7.1.x86_64
-          run_with_heartbeat "git push --tags origin" git push --tags origin -vv
+          git push --tags origin -v
 
-          echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] creating artifact directory: mongodb_consistent_backup_rpm"
           mkdir mongodb_consistent_backup_rpm
-          echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] copying rpm artifact from /root/repo/build/rpm/RPMS/x86_64/mongodb_consistent_backup-$(cat VERSION)-1.el6.x86_64.rpm"
           cp /root/repo/build/rpm/RPMS/x86_64/mongodb_consistent_backup-$(cat VERSION)-1.el6.x86_64.rpm mongodb_consistent_backup_rpm/
-          echo "[$(date -u '+%Y-%m-%dT%H:%M:%SZ')] artifact copy complete"
 
     - save_cache:
         paths:
