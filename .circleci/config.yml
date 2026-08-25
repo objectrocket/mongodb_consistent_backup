@@ -43,12 +43,11 @@ jobs:
 
           git config user.email "dev@objectrocket.com"
           git config user.name "objectrocketdev"
-          TAG_NAME=$(cat VERSION)
-          git tag -a "${TAG_NAME}" -m "Tagged by ${CIRCLE_BUILD_URL}" HEAD
+          git tag -a $(cat VERSION) -m "Tagged by ${CIRCLE_BUILD_URL}" HEAD
           rpm -qa | grep ssh
           rpm -ql libssh2-1.4.2-2.el6_7.1.x86_64
 
-          git push origin "refs/tags/${TAG_NAME}"
+          git push --tags origin
 
           mkdir mongodb_consistent_backup_rpm
           cp /root/repo/build/rpm/RPMS/x86_64/mongodb_consistent_backup-$(cat VERSION)-1.el6.x86_64.rpm mongodb_consistent_backup_rpm/
