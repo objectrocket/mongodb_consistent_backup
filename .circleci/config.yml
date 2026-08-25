@@ -19,20 +19,15 @@ jobs:
       auth:
         username: $DOCKER_USER
         password: $DOCKER_PASS
-
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/postgres:9.4
-
       environment:
         PYTHON_BIN: /usr/local/bin/python2.7
-
     working_directory: ~/repo
-
     steps:
     - checkout
-  
     - run:
         name: set version and build the rpm
         command: |
@@ -47,16 +42,16 @@ jobs:
           rpm -qa | grep ssh
           rpm -ql libssh2-1.4.2-2.el6_7.1.x86_64
 
+          # Use HTTPS for push to avoid SSH protocol hang with old libssh2
+          git remote set-url --push origin https://github.com/objectrocket/mongodb_consistent_backup.git
           git push --tags origin
 
           mkdir mongodb_consistent_backup_rpm
           cp /root/repo/build/rpm/RPMS/x86_64/mongodb_consistent_backup-$(cat VERSION)-1.el6.x86_64.rpm mongodb_consistent_backup_rpm/
-
     - save_cache:
         paths:
         - ./venv
         key: v1-dependencies-{{ checksum "requirements.txt" }}
-
     - store_artifacts:
         path: mongodb_consistent_backup_rpm
         destination: mongodb_consistent_backup
