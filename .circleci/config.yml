@@ -38,7 +38,7 @@ jobs:
         command: |
           set -x
           version=$(cat VERSION)
-          echo "${version}.${CIRCLE_BUILD_NUM}" > VERSION
+          echo "${version}.dev${CIRCLE_BUILD_NUM}" > VERSION
           make rpm
 
           git config user.email "dev@objectrocket.com"
