@@ -35,20 +35,20 @@ jobs:
   
     - run:
         name: set version and build the rpm
-        no_output_timeout: 20m
         command: |
           set -x
           version=$(cat VERSION)
-          echo "${version}.dev${CIRCLE_BUILD_NUM}" > VERSION
+          echo "${version}.${CIRCLE_BUILD_NUM}" > VERSION
           make rpm
 
           git config user.email "dev@objectrocket.com"
           git config user.name "objectrocketdev"
-          git tag -a $(cat VERSION) -m "Tagged by ${CIRCLE_BUILD_URL}" HEAD
+          TAG_NAME=$(cat VERSION)
+          git tag -a "${TAG_NAME}" -m "Tagged by ${CIRCLE_BUILD_URL}" HEAD
           rpm -qa | grep ssh
           rpm -ql libssh2-1.4.2-2.el6_7.1.x86_64
 
-          git push --tags origin
+          git push origin "refs/tags/${TAG_NAME}"
 
           mkdir mongodb_consistent_backup_rpm
           cp /root/repo/build/rpm/RPMS/x86_64/mongodb_consistent_backup-$(cat VERSION)-1.el6.x86_64.rpm mongodb_consistent_backup_rpm/
