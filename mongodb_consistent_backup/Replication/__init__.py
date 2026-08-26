@@ -3,7 +3,7 @@ from ReplsetSharded import ReplsetSharded  # NOQA
 
 
 def config(parser):
-    parser.add_argument("--replication.max_lag_secs", dest="replication.max_lag_secs", default=10, type=int,
+    parser.add_argument("--replication.max_lag_secs", dest="replication.max_lag_secs", default=20, type=int,
                         help="Max lag of backup replica(s) in seconds (default: 10)")
     parser.add_argument("--replication.min_priority", dest="replication.min_priority", default=0, type=int,
                         help="Min priority of secondary members for backup (default: 0)")
