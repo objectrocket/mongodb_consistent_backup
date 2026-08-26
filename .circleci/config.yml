@@ -42,7 +42,9 @@ jobs:
           rpm -qa | grep ssh
           rpm -ql libssh2-1.4.2-2.el6_7.1.x86_64
 
-          # Use HTTPS for push to avoid SSH protocol hang with old libssh2
+          # Remove CircleCI's insteadOf rule that rewrites HTTPS to SSH
+          git config --global --remove-section "url.git@github.com:" 2>/dev/null || true
+          # Use HTTPS for push to avoid SSH key passphrase hang with old openssh
           git remote set-url --push origin https://github.com/objectrocket/mongodb_consistent_backup.git
           git push --tags origin
 
